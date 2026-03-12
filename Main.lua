@@ -2,6 +2,8 @@
 repeat task.wait() until game:IsLoaded()
 repeat task.wait() until game.Players.LocalPlayer
 
+local player = game.Players.LocalPlayer
+
 -- place list
 local Place_ID_With_Matching_Luarmor_ID = {
     [13643807539] = "https://api.luarmor.net/files/v4/loaders/16fbd70fa4f67e17014e3a949c9d57bf.lua"; -- South Bronx
@@ -9,33 +11,53 @@ local Place_ID_With_Matching_Luarmor_ID = {
 
 -- check place
 if not Place_ID_With_Matching_Luarmor_ID[game.PlaceId] then
-    game.Players.LocalPlayer:Kick("Rangers.rawr | This game is not supported!")
+    player:Kick("Rangers.rawr | This game is not supported!")
     return
 end
 
 -- check key
-if not getfenv().script_key then
-    game.Players.LocalPlayer:Kick("Rangers.rawr | Key not found!")
+if not getgenv().script_key then
+    player:Kick("Rangers.rawr | Key not found!")
     return
 end
 
 -- save key
 pcall(function()
-    writefile("rangers_key.txt", getfenv().script_key)
+    writefile("rangers_key.txt", getgenv().script_key)
 end)
 
 -- set key
-script_key = getfenv().script_key
+script_key = getgenv().script_key
 
--- load main script
+-- get loader url
 local url = Place_ID_With_Matching_Luarmor_ID[game.PlaceId]
 
-local success, response = pcall(function()
-    return game:HttpGet(url)
-end)
+-- retry system
+local success = false
+local response
 
+for i = 1,3 do
+    success, response = pcall(function()
+        return game:HttpGet(url, true)
+    end)
+
+    if success and response then
+        break
+    end
+
+    warn("Rangers.rawr | Retry loading script ("..i.."/3)")
+    task.wait(2)
+end
+
+-- execute script
 if success and response then
-    loadstring(response)()
+    local func = loadstring(response)
+
+    if func then
+        func()
+    else
+        player:Kick("Rangers.rawr | Script compile failed!")
+    end
 else
-    game.Players.LocalPlayer:Kick("Rangers.rawr | Failed to load script!")
+    player:Kick("Rangers.rawr | Failed to load script!")
 end
