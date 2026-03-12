@@ -1,51 +1,41 @@
+-- wait game load
 repeat task.wait() until game:IsLoaded()
+repeat task.wait() until game.Players.LocalPlayer
 
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-
-local Place_ID_With_Matching_Loader = {
-    [13643807539] = "https://api.luarmor.net/files/v4/loaders/16fbd70fa4f67e17014e3a949c9d57bf.lua";
+-- place list
+local Place_ID_With_Matching_Luarmor_ID = {
+    [13643807539] = "https://api.luarmor.net/files/v4/loaders/16fbd70fa4f67e17014e3a949c9d57bf.lua"; -- South Bronx
 }
 
-if not Place_ID_With_Matching_Loader[game.PlaceId] then
-    player:Kick("Rangers.rawr | This game is not supported!")
+-- check place
+if not Place_ID_With_Matching_Luarmor_ID[game.PlaceId] then
+    game.Players.LocalPlayer:Kick("Rangers.rawr | This game is not supported!")
     return
 end
 
-local key = getgenv().script_key
-if not key then
-    player:Kick("Rangers.rawr | Key not found!")
+-- check key
+if not getfenv().script_key then
+    game.Players.LocalPlayer:Kick("Rangers.rawr | Key not found!")
     return
 end
 
-script_key = key
-
--- save key jika executor support
-if writefile then
-    pcall(function()
-        writefile("rangers_key.txt", key)
-    end)
-end
-
-task.wait(0.3)
-
-local url = Place_ID_With_Matching_Loader[game.PlaceId]
-
-local data
-local success, err = pcall(function()
-    data = game:HttpGet(url)
+-- save key
+pcall(function()
+    writefile("rangers_key.txt", getfenv().script_key)
 end)
 
-if not success or not data then
-    player:Kick("Rangers.rawr | Failed to fetch script!")
-    return
+-- set key
+script_key = getfenv().script_key
+
+-- load main script
+local url = Place_ID_With_Matching_Luarmor_ID[game.PlaceId]
+
+local success, response = pcall(function()
+    return game:HttpGet(url)
+end)
+
+if success and response then
+    loadstring(response)()
+else
+    game.Players.LocalPlayer:Kick("Rangers.rawr | Failed to load script!")
 end
-
-local loader = loadstring or load
-
-if not loader then
-    player:Kick("Executor does not support loadstring")
-    return
-end
-
-loader(data)()
