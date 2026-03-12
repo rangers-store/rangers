@@ -1,22 +1,17 @@
--- Wait game load
 repeat task.wait() until game:IsLoaded()
 
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
 
--- Place whitelist
 local Place_ID_With_Matching_Loader = {
-    [13643807539] = "https://api.luarmor.net/files/v4/loaders/16fbd70fa4f67e17014e3a949c9d57bf.lua"; -- South Bronx
+    [13643807539] = "https://api.luarmor.net/files/v4/loaders/16fbd70fa4f67e17014e3a949c9d57bf.lua";
 }
 
--- Check place
 if not Place_ID_With_Matching_Loader[game.PlaceId] then
     player:Kick("Rangers.rawr | This game is not supported!")
     return
 end
 
--- Get key
 local key = getgenv().script_key
 if not key then
     player:Kick("Rangers.rawr | Key not found!")
@@ -25,27 +20,26 @@ end
 
 script_key = key
 
--- Save key if supported
+-- save key if executor support
 if writefile then
     pcall(function()
         writefile("rangers_key.txt", key)
     end)
 end
 
--- Wait a little
-task.wait(0.3)
+task.wait(0.2)
 
--- HttpGet compatibility
-local HttpGet = game.HttpGet or game.httpget
+-- universal httpget
+local url = Place_ID_With_Matching_Loader[game.PlaceId]
 
-local success, result = pcall(function()
-    return HttpGet(game, Place_ID_With_Matching_Loader[game.PlaceId])
+local data
+pcall(function()
+    data = game:HttpGet(url)
 end)
 
-if not success then
-    player:Kick("Rangers.rawr | Failed to load script!")
+if not data then
+    player:Kick("Failed to load script")
     return
 end
 
--- Execute
-loadstring(result)()
+loadstring(data)()
