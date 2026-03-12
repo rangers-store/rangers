@@ -1,5 +1,5 @@
 local Place_ID_With_Matching_Luarmor_ID = {
-    [13643807539] = "https://api.luarmor.net/files/v4/loaders/16fbd70fa4f67e17014e3a949c9d57bf.lua"; -- South Bronx
+    [13643807539] = "https://api.luarmor.net/files/v3/loaders/16fbd70fa4f67e17014e3a949c9d57bf.lua"; -- South Bronx
 };
 
 if not Place_ID_With_Matching_Luarmor_ID[game.PlaceId] then
