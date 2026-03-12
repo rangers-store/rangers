@@ -20,26 +20,32 @@ end
 
 script_key = key
 
--- save key if executor support
+-- save key jika executor support
 if writefile then
     pcall(function()
         writefile("rangers_key.txt", key)
     end)
 end
 
-task.wait(0.2)
+task.wait(0.3)
 
--- universal httpget
 local url = Place_ID_With_Matching_Loader[game.PlaceId]
 
 local data
-pcall(function()
+local success, err = pcall(function()
     data = game:HttpGet(url)
 end)
 
-if not data then
-    player:Kick("Failed to load script")
+if not success or not data then
+    player:Kick("Rangers.rawr | Failed to fetch script!")
     return
 end
 
-loadstring(data)()
+local loader = loadstring or load
+
+if not loader then
+    player:Kick("Executor does not support loadstring")
+    return
+end
+
+loader(data)()
