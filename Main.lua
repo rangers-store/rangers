@@ -16,18 +16,20 @@ if not Place_ID_With_Matching_Luarmor_ID[game.PlaceId] then
 end
 
 -- check key
-if not getgenv().script_key then
+if not (getgenv().script_key or script_key) then
     player:Kick("Rangers.rawr | Key not found!")
     return
 end
 
 -- save key
+local key = getgenv().script_key or script_key
 pcall(function()
-    writefile("rangers_key.txt", getgenv().script_key)
+    writefile("rangers_key.txt", key)
 end)
 
 -- set key
-script_key = getgenv().script_key
+getgenv().script_key = key
+script_key = key
 
 -- get loader url
 local url = Place_ID_With_Matching_Luarmor_ID[game.PlaceId]
